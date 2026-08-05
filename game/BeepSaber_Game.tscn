@@ -36,6 +36,8 @@
 [ext_resource type="Script" uid="uid://d1la3rbs4bryo" path="res://game/scripts/SongUploader/song_uploader.gd" id="33_l0uxg"]
 [ext_resource type="PackedScene" uid="uid://dvj8dorx2l7s0" path="res://game/BeepCube/BeepCube.tscn" id="33_nc705"]
 [ext_resource type="PackedScene" uid="uid://b62c3hkjmky75" path="res://game/Chain/ChainLink.tscn" id="34_tsovg"]
+[ext_resource type="Script" uid="uid://cdj0mlqvc6tnw" path="res://game/scripts/DataGathering/SessionData.gd" id="37_0qhbv"]
+[ext_resource type="Script" uid="uid://b8pl66h5kb0jt" path="res://game/scripts/DataGathering/XRORExporter.gd" id="38_w2nyp"]
 
 [sub_resource type="Environment" id="1"]
 background_mode = 2
@@ -294,6 +296,14 @@ main_menu_ref = NodePath("../MainMenu_OQ_UI2DCanvas/BeepSaberMainMenu")
 
 [node name="TelemetryNode" type="Node" parent="." unique_id=1556471748]
 script = ExtResource("1_y3btp")
+
+[node name="SessionDataNode" type="Node" parent="." unique_id=350763942]
+script = ExtResource("37_0qhbv")
+
+[node name="XRORExporter" type="Node" parent="." unique_id=117460019 node_paths=PackedStringArray("session_data", "player_telemetry")]
+script = ExtResource("38_w2nyp")
+session_data = NodePath("../SessionDataNode")
+player_telemetry = NodePath("../TelemetryNode")
 
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_ended"]
 [connection signal="area_entered" from="XROrigin3D/XRCamera3D/PlayerHead" to="." method="_on_PlayerHead_area_entered"]

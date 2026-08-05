@@ -31,6 +31,3 @@ func record_hit(
 	}
 
 	events.append(event)
-
-	print("Recorded hit:")
-	print(event)

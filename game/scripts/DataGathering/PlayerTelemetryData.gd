@@ -42,13 +42,6 @@ func record_frame() -> void:
 
 	frames.append(frame)
 
-	print("----------------------------")
-	print("Recorded frame #", frames.size())
-	print("Time: ", frame["time"])
-	print("Headset Position: ", frame["headset"]["position"])
-	print("Left Controller Position: ", frame["left_controller"]["position"])
-	print("Right Controller Position: ", frame["right_controller"]["position"])
-
 func snapshot(node: Node3D) -> Dictionary:
 	return {
 		"position": node.global_position,
