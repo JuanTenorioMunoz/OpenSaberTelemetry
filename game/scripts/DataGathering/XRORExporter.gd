@@ -35,6 +35,10 @@ func export_session(file_name: String = "") -> void:
 
 	file.store_string(JSON.stringify(xror, "\t"))
 	file.close()
+	
+	var absolute_path := ProjectSettings.globalize_path(path)
+
+	SupabaseUploader.upload_file(absolute_path)
 
 	print("--------------------------------")
 	print("XROR exported successfully!")

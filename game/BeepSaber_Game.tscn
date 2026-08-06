@@ -83,7 +83,7 @@ font_size = 6
 vertical_alignment = 0
 depth = 0.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sm0lh"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0qhbv"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("14_155do")
@@ -195,7 +195,7 @@ skeleton = NodePath("")
 
 [node name="Percent_Indicator" parent="." unique_id=606154483 instance=ExtResource("16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, -2.5)
-material_override = SubResource("ShaderMaterial_sm0lh")
+material_override = SubResource("ShaderMaterial_0qhbv")
 mesh = SubResource("QuadMesh_02xdc")
 
 [node name="EndScore" parent="." unique_id=942289620 instance=ExtResource("20_fgfws")]
@@ -296,6 +296,7 @@ main_menu_ref = NodePath("../MainMenu_OQ_UI2DCanvas/BeepSaberMainMenu")
 
 [node name="TelemetryNode" type="Node" parent="." unique_id=1556471748]
 script = ExtResource("1_y3btp")
+sample_rate = 3.0
 
 [node name="SessionDataNode" type="Node" parent="." unique_id=350763942]
 script = ExtResource("37_0qhbv")
