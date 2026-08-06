@@ -39,7 +39,6 @@ UI_AudioEngine="*res://game/ui/UI_AudioEngine/UI_AudioEngine.tscn"
 GlobalReferences="*res://game/scripts/global_references.gd"
 SaberTelemetryScript="*uid://b3ogc144xnpku"
 DataConfig="*uid://dicsacw64aal5"
-SupabaseUploader="*uid://vw3jrmxy5qou"
 
 [debug]
 

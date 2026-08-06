@@ -38,6 +38,7 @@
 [ext_resource type="PackedScene" uid="uid://b62c3hkjmky75" path="res://game/Chain/ChainLink.tscn" id="34_tsovg"]
 [ext_resource type="Script" uid="uid://cdj0mlqvc6tnw" path="res://game/scripts/DataGathering/SessionData.gd" id="37_0qhbv"]
 [ext_resource type="Script" uid="uid://b8pl66h5kb0jt" path="res://game/scripts/DataGathering/XRORExporter.gd" id="38_w2nyp"]
+[ext_resource type="Script" uid="uid://vw3jrmxy5qou" path="res://game/scripts/DataGathering/SupabaseUploader.gd" id="39_w2nyp"]
 
 [sub_resource type="Environment" id="1"]
 background_mode = 2
@@ -301,10 +302,16 @@ sample_rate = 3.0
 [node name="SessionDataNode" type="Node" parent="." unique_id=350763942]
 script = ExtResource("37_0qhbv")
 
-[node name="XRORExporter" type="Node" parent="." unique_id=117460019 node_paths=PackedStringArray("session_data", "player_telemetry")]
+[node name="XRORExporter" type="Node" parent="." unique_id=117460019 node_paths=PackedStringArray("session_data", "player_telemetry", "uploader")]
 script = ExtResource("38_w2nyp")
 session_data = NodePath("../SessionDataNode")
 player_telemetry = NodePath("../TelemetryNode")
+uploader = NodePath("../SupabaseUploader")
+upload_interval = 3.0
+
+[node name="SupabaseUploader" type="Node" parent="." unique_id=1065792393]
+script = ExtResource("39_w2nyp")
+metadata/_custom_type_script = "uid://vw3jrmxy5qou"
 
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_ended"]
 [connection signal="area_entered" from="XROrigin3D/XRCamera3D/PlayerHead" to="." method="_on_PlayerHead_area_entered"]
