@@ -135,15 +135,6 @@ func _handle_area_collided(area: Area3D) -> void:
 	const BEAT_DISTANCE := 4.0
 	var cutplane := Plane(o, saber_end, saber_end_past + Vector3(0, 0, BEAT_DISTANCE * Map.current_info.beats_per_minute * last_dt / 30)) # Account for relative position to track speed
 	note.cut(type, controller_speed, cutplane, controller)
-	SaberTelemetryScript.record_hit(
-	type,                                 # Left (0) or Right (1) saber
-	SaberTelemetry.EventType.HIT_CORRECT, # Event type
-	note.global_position,                 # Hit position (approximation)
-	cutplane.normal,                      # Plane normal
-	controller_speed.normalized(),        # Swing direction
-	controller_speed.length(),            # Swing strength
-	controller_speed.normalized().dot(cutplane.normal) # Alignment
-	)
 
 func _on_AnimationPlayer_animation_started(_anim_name: StringName) -> void:
 	_swing_cast.adjust_segments = true

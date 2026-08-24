@@ -56,6 +56,9 @@ var gamestate: GameState = gamestate_bootup
 
 @onready var menu := main_menu.ui_control as MainMenu
 
+@onready var xror_exporter := $XRORExporter as XRORExporter
+@onready var session_data := $XRORExporter.session_data as SessionData
+
 
 # There's an interesting issue where the AudioStreamPlayer's playback_position
 # doesn't immediately return to 0.0 after restarting the song_player. This
@@ -83,6 +86,7 @@ func start_map(info: MapInfo, map_difficulty: DifficultyInfo) -> void:
 	if not Map.load_beatmap(info, map_difficulty, map_data):
 		return
 	
+	session_data.set_activity_from_map(info, map_difficulty)
 	update_left_color(Map.color_left)
 	update_right_color(Map.color_right)
 	if Map.event_stack.is_empty():
@@ -95,6 +99,9 @@ func start_map(info: MapInfo, map_difficulty: DifficultyInfo) -> void:
 	
 	_audio_synced_after_restart = false
 	song_player.play(0.0)
+	SaberTelemetryScript.set_song_player(song_player)
+	$TelemetryNode.set_song_player(song_player)
+	xror_exporter.begin_recording()  
 	song_player.volume_db = 0.0
 	_in_wall = false
 	Scoreboard.restart()
@@ -299,6 +306,9 @@ func _on_PlayerHead_area_exited(area: Area3D) -> void:
 # the high score
 func _on_song_ended() -> void:
 	song_player.stop()
+	xror_exporter.end_recording()
+	SaberTelemetryScript.set_song_player(null)
+	$TelemetryNode.set_song_player(null)
 	PlayCount.increment_play_count(Map.current_info,Map.current_difficulty.difficulty_rank)
 	
 	var new_record := false
@@ -392,9 +402,8 @@ func recenter():
 	var xr_camera := $XROrigin3D/XRCamera3D as XRCamera3D
 	xr_origin.rotation.y -= xr_camera.global_rotation.y
 	xr_origin.position -= (xr_camera.global_position * Vector3(1,0,1)) - Vector3(0,0,1)
-	
-@onready var xror_exporter := $XRORExporter as XRORExporter
+
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		xror_exporter.export_session()
+		xror_exporter.end_recording()

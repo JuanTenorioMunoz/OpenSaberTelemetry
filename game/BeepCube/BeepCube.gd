@@ -13,6 +13,9 @@ signal cutted(correct_saber: bool)
 var which_saber: int
 var is_dot: bool
 
+var note_id: int
+var spawn_beat: float
+
 # we store the mesh here as part of the BeepCube for easier access because we will
 # reuse it when we create the cut cube pieces
 var _mesh: Mesh
@@ -88,6 +91,16 @@ func spawn(note_info: ColorNoteInfo, current_beat: float) -> void:
 	
 	slice_particles.reset()
 	mi.visible = true
+	
+	# --- fase 2: Capturar la identidad del cubo para telemetría ---
+	spawn_beat = note_info.beat
+	# scoringType 3 (Normal) para un cubo estandar.
+	# noteID = scoringType*10000 -> (3000) + lineIndex*1000 + lineLayer*100 + color*10 + cutDirection
+	note_id = 30000 \
+		+ note_info.line_index * 1000 \
+		+ note_info.line_layer * 100 \
+		+ note_info.color * 10 \
+		+ note_info.cut_direction
 
 # call this when clearing the track
 func clear_from_track() -> void:
@@ -107,16 +120,27 @@ func make_chain_head() -> void:
 	_mat.set_shader_parameter(&"is_chain_head", true)
 	piece_left.set_chain_head(true)
 	piece_right.set_chain_head(true)
+	 # Cambio para telemetría: Este cambio permite identificar que el beepcube es parte de un CHAIN y no es un BEEPCUBE normal (Cambia su ID).
+	if note_id >= 30000 and note_id < 40000:
+		note_id = note_id - 30000 + 60000
+
 
 func on_miss() -> void:
+	var miss_point := global_position
+	miss_point.x = 0.1
 	SaberTelemetryScript.record_hit(
-		-1,
+		-1,                                # controller: -1 = "no saber involved"
 		SaberTelemetry.EventType.MISSED,
-		global_position,
-		Vector3.ZERO,
-		Vector3.ZERO,
-		0.0,
-		0.0
+		miss_point,
+		Vector3.ZERO,                      # no cut normal — nothing connected
+		Vector3.ZERO,                      # no swing direction
+		0.0,                               # no swing strength
+		0.0,                               # no alignment
+		note_id,                           # <-- which note was missed
+		spawn_beat / Map.current_info.beats_per_minute * 60.0,  # <-- when it should've been hit
+		0.0,                               # no cut distance
+		0.0,                               # no beat accuracy
+		0.0                                # no cut angle accuracy
 	)
 	Scoreboard.reset_combo()
 	hide_cube()
@@ -131,7 +155,7 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 	var cut_direction_xy := -Vector3(cut_speed.x, cut_speed.y, 0.0).normalized()
 	var base_cut_angle_accuracy := global_transform.basis.y.dot(cut_direction_xy)
 	var cut_distance := cut_plane.distance_to(global_transform.origin)
-	
+
 	if saber_type == which_saber:
 		var cut_angle_accuracy := clampf((base_cut_angle_accuracy-0.7)/0.3, 0.0, 1.0)
 		if is_dot: #ignore angle if is a dot
@@ -143,25 +167,35 @@ func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, controller: Beep
 		var beat_accuracy := clampf((1.0 - absf(global_transform.origin.z)) / 0.5, 0.0, 1.0)
 		Scoreboard.note_cut(transform.origin, beat_accuracy, cut_angle_accuracy, cut_distance_accuracy, travel_distance_factor)
 		SaberTelemetryScript.record_hit(
-		saber_type,
-		SaberTelemetry.EventType.HIT_CORRECT,
-		global_position,
-		cut_plane.normal,
-		cut_speed.normalized(),
-		cut_speed.length(),
-		cut_angle_accuracy
+			saber_type,
+			SaberTelemetry.EventType.HIT_CORRECT,
+			global_position,
+			cut_plane.normal,
+			cut_speed.normalized(),
+			cut_speed.length(),
+			cut_angle_accuracy,
+			note_id,
+			spawn_beat / Map.current_info.beats_per_minute * 60.0,
+			absf(cut_distance),
+			beat_accuracy,
+			cut_angle_accuracy
 		)
 		cutted.emit(true)
 	else:
 		Scoreboard.bad_cut(transform.origin)
 		SaberTelemetryScript.record_hit(
-		saber_type,
-		SaberTelemetry.EventType.HIT_INCORRECT,
-		global_position,
-		cut_plane.normal,
-		cut_speed.normalized(),
-		cut_speed.length(),
-		base_cut_angle_accuracy
+			saber_type,
+			SaberTelemetry.EventType.HIT_INCORRECT,
+			global_position,
+			cut_plane.normal,
+			cut_speed.normalized(),
+			cut_speed.length(),
+			base_cut_angle_accuracy,
+			note_id,
+			spawn_beat / Map.current_info.beats_per_minute * 60.0,
+			absf(cut_distance),
+			0.0,
+			base_cut_angle_accuracy
 		)
 		cutted.emit(false)
 	

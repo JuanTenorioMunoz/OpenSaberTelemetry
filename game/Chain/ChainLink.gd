@@ -1,6 +1,10 @@
 extends Cuttable
 class_name ChainLink
 
+# Elementos de telemetría: Identificadores de nota y el spawn beat que indica el beat ilustrado dentro de la canción.
+var note_id: int
+var spawn_beat: float
+
 var which_saber: int
 var _mesh: Mesh
 var _mat: ShaderMaterial
@@ -103,6 +107,13 @@ func spawn(chain_info: ChainInfo, current_beat: float, head_pos: Vector2, tail_p
 	anim.play(&"Spawn")
 	
 	mi.visible = true
+	
+	spawn_beat = beat
+	note_id = 70000 \
+	+ chain_info.head_line_index * 1000 \
+	+ chain_info.head_line_layer * 100 \
+	+ chain_info.color * 10 \
+	+ 8   # cutDirection: chain elements have no discrete direction; 8 = "any/dot"
 
 # call this when clearing the track
 func clear_from_track() -> void:
@@ -118,12 +129,30 @@ func hide_cube() -> void:
 	# disable processing on this node and all children to help with performance
 	process_mode = Node.PROCESS_MODE_DISABLED # disable to help with performance
 
-func cut(saber_type: int, _cut_speed: Vector3, cut_plane: Plane, _controller: BeepSaberController) -> void:
+func cut(saber_type: int, cut_speed: Vector3, cut_plane: Plane, _controller: BeepSaberController) -> void:
+	var event_type: SaberTelemetry.EventType
 	if saber_type == which_saber:
 		Scoreboard.chain_link_cut(transform.origin)
+		event_type = SaberTelemetry.EventType.HIT_CORRECT
 	else:
 		Scoreboard.bad_cut(transform.origin)
-	
+		event_type = SaberTelemetry.EventType.HIT_INCORRECT
+
+	SaberTelemetryScript.record_hit(
+		saber_type,
+		event_type,
+		Vector3(transform.origin.x, transform.origin.y, 0.0),  # strike-plane point
+		cut_plane.normal,
+		cut_speed.normalized(),
+		cut_speed.length(),
+		0.0,                    # alignment — not computed for chain links
+		note_id,
+		spawn_beat / Map.current_info.beats_per_minute * 60.0,
+		0.0,                    # cut_distance_to_center — not computed
+		0.0,                    # beat_accuracy — not computed
+		0.0                     # cut_angle_accuracy — not computed
+	)
+
 	hide_cube()
 	if Settings.cube_cuts_falloff:
 		_start_cut_pieces(cut_plane)
@@ -132,6 +161,17 @@ func cut(saber_type: int, _cut_speed: Vector3, cut_plane: Plane, _controller: Be
 		release()# release now instead of waiting for cut pieces to die off
 
 func on_miss() -> void:
+	SaberTelemetryScript.record_hit(
+		-1,
+		SaberTelemetry.EventType.MISSED,
+		Vector3(transform.origin.x, transform.origin.y, 0.1),  # miss placeholder z
+		Vector3.ZERO,
+		Vector3.ZERO,
+		0.0, 0.0,
+		note_id,
+		spawn_beat / Map.current_info.beats_per_minute * 60.0,
+		0.0, 0.0, 0.0
+	)
 	Scoreboard.reset_combo()
 	hide_cube()
 	release()

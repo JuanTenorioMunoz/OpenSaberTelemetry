@@ -84,7 +84,7 @@ font_size = 6
 vertical_alignment = 0
 depth = 0.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0qhbv"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w2nyp"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("14_155do")
@@ -196,7 +196,7 @@ skeleton = NodePath("")
 
 [node name="Percent_Indicator" parent="." unique_id=606154483 instance=ExtResource("16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, -2.5)
-material_override = SubResource("ShaderMaterial_0qhbv")
+material_override = SubResource("ShaderMaterial_w2nyp")
 mesh = SubResource("QuadMesh_02xdc")
 
 [node name="EndScore" parent="." unique_id=942289620 instance=ExtResource("20_fgfws")]
@@ -307,7 +307,6 @@ script = ExtResource("38_w2nyp")
 session_data = NodePath("../SessionDataNode")
 player_telemetry = NodePath("../TelemetryNode")
 uploader = NodePath("../SupabaseUploader")
-upload_interval = 3.0
 
 [node name="SupabaseUploader" type="Node" parent="." unique_id=1065792393]
 script = ExtResource("39_w2nyp")

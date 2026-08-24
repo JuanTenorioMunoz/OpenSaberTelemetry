@@ -3,3 +3,6 @@
 /android/
 .env
 config.cfg
+
+# Project specific ignores
+game/scripts/DataGathering/SupabaseUploader.gd
