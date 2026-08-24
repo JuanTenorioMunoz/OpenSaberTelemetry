@@ -2,6 +2,7 @@ extends Panel
 class_name BeatSaverPanel
 
 class BeatSaverSongInfo extends RefCounted:
+	var hash: String   # NUEVO CAMPO PARA TELEMETRÍA
 	var name: String
 	var description: String
 	var song_name: String
@@ -15,6 +16,8 @@ class BeatSaverSongInfo extends RefCounted:
 		name = Utils.get_str(song_info, "name", "")
 		description = Utils.get_str(song_info, "description", "")
 		versions = Utils.get_array(song_info, "versions", [])
+		if versions.size() > 0 and versions[0] is Dictionary:
+			hash = Utils.get_str(versions[0] as Dictionary, "hash", "")
 		uploader_id = int(Utils.get_float(Utils.get_dict(song_info, "uploader", {}), "id", -1))
 		var metadata := Utils.get_dict(song_info, "metadata", {})
 		song_name = Utils.get_str(metadata, "songName", "")
@@ -280,6 +283,14 @@ func _on_HTTPRequest_download_completed(result: int, response_code: int, headers
 		
 		if not has_error:
 			Utils.unzip(zippath,song_out_dir)
+			var map_hash := ""
+			if downloading[0][1] is Dictionary:
+				map_hash = str((downloading[0][1] as Dictionary).get("hash", ""))
+			if not map_hash.is_empty():
+				var hf := FileAccess.open(song_out_dir.path_join("beatsaver_hash.txt"), FileAccess.WRITE)
+				if hf:
+					hf.store_string(map_hash)
+					hf.close()
 		
 		DirAccess.remove_absolute(zippath)
 		
