@@ -28,6 +28,7 @@ var BUTTON_LAYOUT_SYMBOLS: Array[PackedStringArray] = [
 
 signal enter_pressed
 signal cancel_pressed
+signal key_event(ev: InputEventKey)
 
 
 var _all_letter_buttons: Array[Button] = []
@@ -86,7 +87,7 @@ func _on_button_down(b: Button) -> void:
 	
 	var ev := _create_input_event(b, true)
 	if (!ev): return
-	Input.parse_input_event(ev)
+	key_event.emit(ev)
 
 
 func _on_button_up(b: Button) -> void:
@@ -94,7 +95,7 @@ func _on_button_up(b: Button) -> void:
 	
 	var ev := _create_input_event(b, false)
 	if (!ev): return
-	Input.parse_input_event(ev)
+	key_event.emit(ev)
 
 
 func _create_button(parent: Node, text: String, x: float, y: float, w: float = 1.0, h: float = 1.0) -> Button:

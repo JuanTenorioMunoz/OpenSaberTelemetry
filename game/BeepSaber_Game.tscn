@@ -39,6 +39,8 @@
 [ext_resource type="Script" uid="uid://cdj0mlqvc6tnw" path="res://game/scripts/DataGathering/SessionData.gd" id="37_0qhbv"]
 [ext_resource type="Script" uid="uid://b8pl66h5kb0jt" path="res://game/scripts/DataGathering/XRORExporter.gd" id="38_w2nyp"]
 [ext_resource type="Script" uid="uid://vw3jrmxy5qou" path="res://game/scripts/DataGathering/SupabaseUploader.gd" id="39_w2nyp"]
+[ext_resource type="PackedScene" path="res://game/scripts/Auth/AuthPanel.tscn" id="40_auth"]
+[ext_resource type="Script" uid="uid://bkayqdu8d3wff" path="res://game/scripts/Auth/SupabaseAuth.gd" id="41_auth"]
 
 [sub_resource type="Environment" id="1"]
 background_mode = 2
@@ -84,7 +86,7 @@ font_size = 6
 vertical_alignment = 0
 depth = 0.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0qhbv"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ks3yp"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("14_155do")
@@ -196,7 +198,7 @@ skeleton = NodePath("")
 
 [node name="Percent_Indicator" parent="." unique_id=606154483 instance=ExtResource("16")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, -2.5)
-material_override = SubResource("ShaderMaterial_0qhbv")
+material_override = SubResource("ShaderMaterial_ks3yp")
 mesh = SubResource("QuadMesh_02xdc")
 
 [node name="EndScore" parent="." unique_id=942289620 instance=ExtResource("20_fgfws")]
@@ -290,6 +292,22 @@ visible = false
 cancelable = false
 min_chars_to_enable_enter = 1
 is_name_input = true
+
+[node name="Auth_Canvas" parent="." unique_id=1067082913 instance=ExtResource("3")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1.55, -1)
+update_only_on_input = false
+
+[node name="AuthPanel" parent="Auth_Canvas" unique_id=628373266 instance=ExtResource("40_auth")]
+
+[node name="Keyboard_auth" parent="." unique_id=1248409425 instance=ExtResource("21")]
+transform = Transform3D(2.40442, 0, 0, 0, 2.37659, 0.364816, 0, -0.364816, 2.37659, -0.00735812, 0.350501, -0.67319)
+visible = false
+cancelable = false
+min_chars_to_enable_enter = 2
+is_name_input = true
+
+[node name="SupabaseAuth" type="Node" parent="." unique_id=1671212401]
+script = ExtResource("41_auth")
 
 [node name="SongUploader" type="Node" parent="." unique_id=286843276 node_paths=PackedStringArray("main_menu_ref")]
 script = ExtResource("33_l0uxg")

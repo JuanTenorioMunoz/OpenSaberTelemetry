@@ -3,6 +3,7 @@ class_name PlayerTelemetryData
 
 @export var sample_rate: float = 30.0
 
+var enabled := false
 var next_sample: float = 0.0
 var frames: Array[Dictionary] = []
 
@@ -21,7 +22,15 @@ func _ready() -> void:
 	print("Left Controller: ", game.left_controller)
 	print("Right Controller: ", game.right_controller)
 
+func clear_frames() -> void:
+	frames.clear()
+	next_sample = 0.0
+
+
 func _process(_delta: float) -> void:
+	if not enabled:
+		return
+
 	var current_time := Time.get_ticks_msec() / 1000.0
 
 	if current_time < next_sample:

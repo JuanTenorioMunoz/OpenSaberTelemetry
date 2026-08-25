@@ -31,3 +31,7 @@ func record_hit(
 	}
 
 	events.append(event)
+
+
+func clear_events() -> void:
+	events.clear()

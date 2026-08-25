@@ -8,6 +8,7 @@ class_name BeepSaber_Game
 var version := "0.5.0"
 
 var gamestate_bootup := GameState.new()
+var gamestate_auth := GameStateAuth.new()
 var gamestate_mapcomplete := GameStateMapComplete.new()
 var gamestate_mapselection := GameStateMapSelection.new()
 var gamestate_newhighscore := GameStateNewHighScore.new()
@@ -35,6 +36,10 @@ var gamestate: GameState = gamestate_bootup
 @onready var highscore_panel := highscore_canvas.ui_control as HighscorePanel
 @onready var name_selector_canvas := $NameSelector_Canvas as OQ_UI2DCanvas
 @onready var highscore_keyboard := $Keyboard_highscore as OQ_UI2DKeyboard
+@onready var auth_canvas := $Auth_Canvas as OQ_UI2DCanvas
+@onready var auth_panel := auth_canvas.ui_control as AuthPanel
+@onready var auth_keyboard := $Keyboard_auth as OQ_UI2DKeyboard
+@onready var supabase_auth := $SupabaseAuth as SupabaseAuth
 @onready var endscore := $EndScore as EndScore
 
 @onready var points_label_driver := $Points_label_driver as PointsLabelDriver
@@ -133,8 +138,16 @@ func _submit_highscore(player_name: String) -> void:
 		_transition_game_state(gamestate_mapcomplete)
 
 func _check_and_update_saber(controller: BeepSaberController, saber: LightSaber) -> void:
-	# to allow extending/sheething the saber while not playing a song
-	if ((not song_player.playing)
+	# do not toggle sabers while using on-screen keyboards; letter/number keys
+	# used to be injected globally and flipped AX/BY by accident
+	var keyboard_open := (
+		gamestate == gamestate_auth
+		or highscore_keyboard.visible
+		or auth_keyboard.visible
+		or online_search_keyboard.visible
+	)
+	if ((not keyboard_open)
+		and (not song_player.playing)
 		and (controller.ax_just_pressed() or controller.by_just_pressed())
 		and (not saber._anim.is_playing())):
 		if (saber.is_extended()): saber._hide()
@@ -197,8 +210,22 @@ func _ready() -> void:
 	
 	UI_AudioEngine.attach_children(highscore_keyboard)
 	UI_AudioEngine.attach_children(online_search_keyboard)
-	
-	_transition_game_state(gamestate_mapselection)
+	UI_AudioEngine.attach_children(auth_keyboard)
+
+	@warning_ignore("return_value_discarded")
+	auth_panel.credentials_submitted.connect(_on_auth_credentials_submitted)
+	@warning_ignore("return_value_discarded")
+	auth_panel.input_field_changed.connect(_on_auth_input_field_changed)
+	@warning_ignore("return_value_discarded")
+	auth_keyboard.text_input_enter.connect(_on_auth_keyboard_enter)
+	@warning_ignore("return_value_discarded")
+	auth_keyboard.text_changed.connect(_on_auth_keyboard_text_changed)
+	@warning_ignore("return_value_discarded")
+	supabase_auth.auth_succeeded.connect(_on_auth_succeeded)
+	@warning_ignore("return_value_discarded")
+	supabase_auth.auth_failed.connect(_on_auth_failed)
+
+	_transition_game_state(gamestate_auth)
 	
 	@warning_ignore("return_value_discarded")
 	Scoreboard.score_changed.connect(_display_points)
@@ -280,6 +307,50 @@ func _display_points() -> void:
 	(point_label.mesh as TextMesh).text = "Score: %6d" % Scoreboard.points
 	(multiplier_label.mesh as TextMesh).text = "x %d\nCombo %d" % [Scoreboard.multiplier, Scoreboard.combo]
 	percent_indicator.update_percent(hit_rate)
+
+func set_auth_ui_visible(showing: bool) -> void:
+	if showing:
+		auth_canvas._show()
+		auth_keyboard._show()
+		auth_panel.reset_for_prompt()
+	else:
+		auth_canvas._hide()
+		auth_keyboard._hide()
+
+
+func _on_auth_input_field_changed(field: String) -> void:
+	if field == "username":
+		auth_keyboard.configure_input(true, 2)
+	else:
+		auth_keyboard.configure_input(false, 6)
+
+
+func _on_auth_keyboard_enter(text: String) -> void:
+	if gamestate == gamestate_auth:
+		auth_panel.apply_keyboard_text(text)
+
+
+func _on_auth_keyboard_text_changed(text: String) -> void:
+	if gamestate == gamestate_auth:
+		auth_panel.preview_keyboard_text(text)
+
+
+func _on_auth_credentials_submitted(username: String, password: String) -> void:
+	supabase_auth.register_or_login(username, password)
+
+
+func _on_auth_succeeded(user_id: String, username: String, access_token: String) -> void:
+	auth_panel.set_busy(false)
+	auth_panel.remember_username(username)
+	auth_panel.set_status("Signed in as %s" % username)
+	xror_exporter.begin_recording(user_id, username, access_token)
+	_transition_game_state(gamestate_mapselection)
+
+
+func _on_auth_failed(message: String) -> void:
+	auth_panel.set_busy(false)
+	auth_panel.set_status(message)
+
 
 # accessor method for the player name selector UI element
 func _name_selector() -> NameSelector:

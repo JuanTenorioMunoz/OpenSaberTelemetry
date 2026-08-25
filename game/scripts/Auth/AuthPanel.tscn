@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://b714dyp7scefh"]
+
+[ext_resource type="Theme" uid="uid://dvcjel72een6o" path="res://OQ_Toolkit/OQ_UI2D/theme/oq_ui2d_standard.theme" id="1"]
+[ext_resource type="Script" uid="uid://ceelponr6mlr0" path="res://game/scripts/Auth/AuthPanel.gd" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(1, 1, 1, 1)
+
+[node name="AuthPanel" type="Panel" unique_id=1409571759]
+offset_right = 720.0
+offset_bottom = 520.0
+theme = ExtResource("1")
+theme_override_styles/panel = SubResource("1")
+script = ExtResource("2")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=774338309]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1342317021]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Margin/VBox" unique_id=1233064703]
+layout_mode = 2
+text = "Player Login / Register"
+
+[node name="HelpLabel" type="Label" parent="Margin/VBox" unique_id=7225478]
+layout_mode = 2
+text = "New names are registered in Supabase. Existing names sign in with their password."
+autowrap_mode = 3
+
+[node name="UsernameRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1880710477]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="UsernameButton" type="Button" parent="Margin/VBox/UsernameRow" unique_id=1804853147]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+text = "Player Name"
+
+[node name="UsernameValue" type="Label" parent="Margin/VBox/UsernameRow" unique_id=882963080]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "(empty)"
+clip_text = true
+
+[node name="PasswordRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1566120984]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PasswordButton" type="Button" parent="Margin/VBox/PasswordRow" unique_id=812407069]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+text = "Password"
+
+[node name="PasswordValue" type="Label" parent="Margin/VBox/PasswordRow" unique_id=1012173715]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "(empty)"
+clip_text = true
+
+[node name="Remembered" type="VBoxContainer" parent="Margin/VBox" unique_id=1684120286]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RememberedLabel" type="Label" parent="Margin/VBox/Remembered" unique_id=1839785287]
+layout_mode = 2
+text = "Saved names"
+
+[node name="NameRow" type="HBoxContainer" parent="Margin/VBox/Remembered" unique_id=1232646077]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatusLabel" type="Label" parent="Margin/VBox" unique_id=142196988]
+layout_mode = 2
+text = "Enter a player name, then a password."
+autowrap_mode = 3
+
+[node name="ContinueButton" type="Button" parent="Margin/VBox" unique_id=1451434737]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "Register / Login"
+
+[connection signal="pressed" from="Margin/VBox/UsernameRow/UsernameButton" to="." method="_on_username_button_pressed"]
+[connection signal="pressed" from="Margin/VBox/PasswordRow/PasswordButton" to="." method="_on_password_button_pressed"]
+[connection signal="pressed" from="Margin/VBox/ContinueButton" to="." method="_on_continue_button_pressed"]

@@ -1,10 +1,10 @@
 extends GameState
-class_name GameStateSettings
+class_name GameStateAuth
 
 func _ready(game: BeepSaber_Game) -> void:
 	game.main_menu._hide()
-	game.settings_canvas._show()
-	game.show_MapSourceDialogs(true)
+	game.settings_canvas._hide()
+	game.show_MapSourceDialogs(false)
 	game.endscore._hide()
 	game.pause_menu._hide()
 	game.highscore_canvas._hide()
@@ -19,4 +19,6 @@ func _ready(game: BeepSaber_Game) -> void:
 	game.right_ui_raycast.visible = true
 	game.highscore_keyboard._hide()
 	game.online_search_keyboard._hide()
-	game.set_auth_ui_visible(false)
+	game.left_saber.set_swingcast_enabled(false)
+	game.right_saber.set_swingcast_enabled(false)
+	game.set_auth_ui_visible(true)

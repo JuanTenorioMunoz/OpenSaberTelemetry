@@ -20,6 +20,7 @@ class_name OQ_UI2DKeyboard
 
 signal text_input_cancel()
 signal text_input_enter(text: String)
+signal text_changed(text: String)
 
 
 func _on_cancel() -> void:
@@ -38,6 +39,7 @@ func _ready() -> void:
 	#_text_edit = $OQ_UI2DCanvas_TextInput.find_child("TextEdit", true, false) as TextEdit
 	#_keyboard = $OQ_UI2DCanvas_Keyboard.find_child("VirtualKeyboard", true, false) as VirtualKeyboard
 	_keyboard.set_cancelable(cancelable)
+	_keyboard.key_event.connect(_forward_key_to_text_input)
 	
 	# force update of things that based on the text input
 	#  * enable/disable enter key based on min char length
@@ -45,6 +47,27 @@ func _ready() -> void:
 	_on_TextEdit_text_changed()
 	
 	_text_edit.grab_focus()
+
+func configure_input(p_is_name_input: bool, p_min_chars: int) -> void:
+	is_name_input = p_is_name_input
+	min_chars_to_enable_enter = p_min_chars
+	if not p_is_name_input:
+		_keyboard.set_upper_case(false)
+	_text_edit.grab_focus()
+	_on_TextEdit_text_changed()
+
+
+func get_input_text() -> String:
+	return _text_edit.text
+
+
+func _forward_key_to_text_input(ev: InputEventKey) -> void:
+	_text_edit.grab_focus()
+	var text_canvas := $OQ_UI2DCanvas_TextInput as OQ_UI2DCanvas
+	if text_canvas and text_canvas.viewport:
+		text_canvas.viewport.push_input(ev)
+		text_canvas._input_update()
+
 
 func _show() -> void:
 	visible = true
@@ -54,6 +77,7 @@ func _hide() -> void:
 	visible = false
 
 func _on_TextEdit_text_changed() -> void:
+	text_changed.emit(_text_edit.text)
 	var text_len := _text_edit.text.length()
 	var disable_enter := text_len < min_chars_to_enable_enter
 	_keyboard.enter_button_disabled(disable_enter)

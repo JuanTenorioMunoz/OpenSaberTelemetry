@@ -64,5 +64,15 @@ func start_session() -> void:
 	print("Session metadata created.")
 	print(session)
 
+func set_user(user_id: String, username: String) -> void:
+	if session.is_empty():
+		start_session()
+	session["user"] = {
+		"id": user_id,
+		"name": username
+	}
+	print("Session user set: ", session["user"])
+
+
 func get_session() -> Dictionary:
 	return session

@@ -21,10 +21,6 @@ func initialize() -> bool:
 	# -----------------------------
 	# Hardcoded configuration
 	# -----------------------------
-	supabase_url = "https://mbotszxdxyiqadubpmek.supabase.co"
-
-	anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ib3RzenhkeHlpcWFkdWJwbWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NjY3OTIsImV4cCI6MjEwMTU0Mjc5Mn0.-b-4GqVC02Ky9pT56qBhMbI3JWlEbdi1HxVLo1g2hxc"
-
 	bucket = "OpenSaberFiles"
 	folder = "TestFolder"
 
